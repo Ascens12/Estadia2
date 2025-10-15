@@ -26,14 +26,18 @@ SECRET_KEY = 'django-insecure-god5hezg+gr@o+sm!*z&-yhla9603z&^hhui*cx^(*)oq^usb4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = [host for host in os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",") if host]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://192.168.1.123:8000",
-    "http://187.214.167.93:8000",
-]
+_csrf_origins = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = [origin for origin in _csrf_origins.split(",") if origin]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://192.168.1.123:8000",
+        "http://187.214.167.93:8000",
+    ]
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,25 +60,25 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'usuario.Usuario'
 ASGI_APPLICATION = 'EcoGestion.asgi.application'
 
-ASGI_APPLICATION = 'EcoGestion.asgi.application'
-
 CHANNEL_LAYERS = {
-  "default": {
-    "BACKEND": "channels_redis.core.RedisChannelLayer",
-    "CONFIG": {"hosts": [("127.0.0.1", 6379)]},  
-  }
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                (
+                    os.getenv("REDIS_HOST", "127.0.0.1"),
+                    int(os.getenv("REDIS_PORT", "6379")),
+                )
+            ]
+        },
+    }
 }
-
-ALLOWED_HOSTS = ['*']  # Mi IP LAN
 
 
 AUTHENTICATION_BACKENDS = [
     'usuario.backends.MatriculaBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-ASGI_APPLICATION = 'EcoGestion.asgi.application'
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,20 +109,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'EcoGestion.wsgi.application'
 
-ASGI_APPLICATION = "EcoGestion.asgi.application"
-
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = { 
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'EcoGest',
-        'USER': 'root',
-        'PASSWORD': '8246',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.getenv('MYSQL_DATABASE', 'EcoGest'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', '8246'),
+        'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
     }
 }
 
@@ -194,13 +195,6 @@ EMAIL_HOST_USER = 'gadielvillaf@gmail.com'  # Cambia esto por tu email
 EMAIL_HOST_PASSWORD = 'dczd zcke bjzm vfhe'     # Cambia esto por tu contraseña
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-    },
-}
 
 # Configuración imagenes
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

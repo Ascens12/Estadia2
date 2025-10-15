@@ -1,0 +1,10 @@
+Django==5.2.6
+channels>=4.1,<5
+channels-redis>=4.2,<5
+django-cleanup>=8.1,<9
+django-dbbackup>=4.0,<5
+mysqlclient>=2.2,<3
+folium>=0.17,<0.18
+Pillow>=10.4,<11
+redis>=5.0,<6
+daphne>=4.1,<5
